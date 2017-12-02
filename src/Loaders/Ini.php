@@ -14,7 +14,7 @@ class Ini extends Loader
      */
     public function getArray()
     {
-        $parsed = @parse_ini_file($this->context, true);
+        $parsed = @parse_ini_file($this->context, true, INI_SCANNER_TYPED);
 
         if (! $parsed) {
             throw new InvalidFileException('Unable to parse invalid INI file at ' . $this->context);
