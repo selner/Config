@@ -26,8 +26,9 @@ class Config implements \ArrayAccess
      * @param bool   $override Whether or not to override existing options with
      *                         values from the loaded file
      */
-    public function __construct($context = null, $importKey = "imports", $override = false)
+    public function __construct($context = null, $override = true, $importKey = "imports")
     {
+        $this->_importKey = $importKey;
 
         switch (gettype($context)) {
             case 'NULL':
@@ -36,33 +37,12 @@ class Config implements \ArrayAccess
                 $this->config = $context;
                 break;
             case 'string':
-                $this->load($context);
-                if(is_file($context))
-                {
-                    $childContexts = array();
-                    $this->processImports($importKey, $this->config,$childContexts);
-                    if(!empty($childContexts))
-                        foreach($childContexts as $childContext)
-                            $this->load($childContext, $override);
-                }
-
+                $this->load($context, $override, $importKey);
                 break;
             default:
                 throw new InvalidContextException('Failed to initialize config');
         }
 
-    }
-
-    private function processImports($importKey, $context, &$childContexts)
-    {
-        if(array_key_exists($importKey, $context) && !empty($context[$importKey]) === true)
-        {
-            foreach(array_keys($context[$importKey]) as $childKey)
-            {
-                $childContexts[$childKey] = $context[$importKey][$childKey];
-                $this->processImports($importKey, $childContexts[$childKey], $childContexts);
-            }
-        }
     }
 
     /**
@@ -160,16 +140,16 @@ class Config implements \ArrayAccess
      *
      * @return object This Config object
      */
-    public function load($path, $override = true)
+    public function load($path, $override = true, $importKey="imports")
     {
         $file = new SplFileInfo($path);
 
         $fileType = $file->isDir() ? 'Directory' : ucfirst(strtolower($file->getExtension()));
         $className = "\\PHLAK\\Config\\Loaders\\" . $fileType;
         if(class_exists($className, true)) {
-            $loader = new $className($file->getRealPath());
+            $loader = new $className($file->getRealPath(), $importKey);
 
-            $thisArr = $loader->toArray();
+            $thisArr = $loader->toArray($override);
             if ($override === true) {
                 $this->config = $this->array_merge_recursive_distinct($this->config, $thisArr);
             } else {
