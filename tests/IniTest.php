@@ -19,6 +19,13 @@ class IniTest extends PHPUnit_Framework_TestCase
         $config->set('drivers.mysql.password', 'overrideme');
         $config->load(__DIR__ . '/files/ini/config_imports.ini', false);
 
+        // verify we got an expected value from the root INI file
+        $this->assertEquals('postmaster@localhost', $config->get('email.admin'));
+
+        // verify we got an expected value from the child INI file
+        $this->assertEquals('localhost', $config->get('drivers.mysql.host'));
+
+        // verify overwrite worked as expected
         $this->assertEquals('overrideme', $config->get('drivers.mysql.password'));
     }
 
@@ -29,7 +36,14 @@ class IniTest extends PHPUnit_Framework_TestCase
         $config->set('drivers.mysql.password', 'overrideme');
         $config->load(__DIR__ . '/files/ini/config_imports.ini', true);
 
-        $this->assertEquals('farmer1', $config->get('drivers.mysql.password'));
+        // verify we got an expected value from the root INI file
+        $this->assertEquals('postmaster@localhost', $config->get('email.admin'));
+
+        // verify we got an expected value from the child INI file
+        $this->assertEquals('localhost', $config->get('drivers.mysql.host'));
+
+        // verify overwrite worked as expected
+        $this->assertEquals('hunter2', $config->get('drivers.mysql.password'));
     }
 
     public function test_it_can_load_typed_values()
