@@ -55,7 +55,7 @@ class Config implements \ArrayAccess
 
     private function processImports($importKey, $context, &$childContexts)
     {
-        if(array_key_exists($importKey, $context) && $context[$importKey] === true)
+        if(array_key_exists($importKey, $context) && !empty($context[$importKey]) === true)
         {
             foreach(array_keys($context[$importKey]) as $childKey)
             {
