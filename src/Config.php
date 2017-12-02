@@ -4,8 +4,12 @@ namespace PHLAK\Config;
 
 use PHLAK\Config\Traits\ArrayAccess;
 use PHLAK\Config\Exceptions\InvalidContextException;
-use SplFileInfo;
+use \SplFileInfo;
 
+/**
+ * Class Config
+ * @package PHLAK\Config
+ */
 class Config implements \ArrayAccess
 {
     use ArrayAccess;
@@ -18,8 +22,11 @@ class Config implements \ArrayAccess
      *
      * @param mixed $context Raw array of configuration options or path to a
      *                       configuration file or directory
+     * @param string $importKey Config key that may optionally contain child import contexts to load
+     * @param bool   $override Whether or not to override existing options with
+     *                         values from the loaded file
      */
-    public function __construct($context = null)
+    public function __construct($context = null, $importKey = "imports", $override = false)
     {
         switch (gettype($context)) {
             case 'NULL':
@@ -32,6 +39,26 @@ class Config implements \ArrayAccess
                 break;
             default:
                 throw new InvalidContextException('Failed to initialize config');
+        }
+
+        $childContexts = array();
+        $this->processImports($importKey, $this->config, $childContexts);
+        if(!empty($childContexts))
+            foreach($childContexts as $childContext)
+                $this->load($childContext, $override);
+
+    }
+
+    private function processImports($importKey, $context, &$childContexts)
+    {
+        if(array_key_exists($importKey, $context) && $context[$importKey] === true)
+        {
+            $contexts = ($importKey);
+            foreach(array_keys($contexts[$importKey]) as $childKey)
+            {
+                $childContexts[$childKey] = $contexts[$importKey][$childKey];
+                $this->processImports($importKey, $childContexts[$childKey], $childContexts);
+            }
         }
     }
 
@@ -134,19 +161,23 @@ class Config implements \ArrayAccess
     {
         $file = new SplFileInfo($path);
 
-        $className = $file->isDir() ? 'Directory' : ucfirst(strtolower($file->getExtension()));
-        $classPath = 'PHLAK\\Config\\Loaders\\' . $className;
+        $fileType = $file->isDir() ? 'Directory' : ucfirst(strtolower($file->getExtension()));
+        $className = "\\PHLAK\\Config\\Loaders\\" . $fileType;
+        if(class_exists($className, true)) {
+            $loader = new $className($file->getRealPath());
 
-        $loader = new $classPath($file->getRealPath());
+            $thisArr = $loader->toArray();
+            if ($override === true) {
+                $this->config = $this->array_merge_recursive_distinct($this->config, $thisArr);
+            } else {
+                $this->config = $this->array_merge_recursive_distinct($thisArr, $this->config);
+            }
 
-        $thisArr = $loader->toArray();
-        if ($override === true) {
-            $this->config = $this->array_merge_recursive_distinct($this->config, $thisArr);
-        } else {
-            $this->config = $this->array_merge_recursive_distinct($thisArr, $this->config);
+            return $this;
         }
 
-        return $this;
+        throw new \InvalidArgumentException("No loader defined for files of type '{$fileType}'.");
+
     }
 
     /**

@@ -28,4 +28,8 @@ abstract class Loader implements Loadable
         return $arr;
     }
 
+    protected function getArray()
+    {
+        return array();
+    }
 }
