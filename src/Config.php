@@ -132,6 +132,17 @@ class Config implements \ArrayAccess
     }
 
     /**
+     * Retrieve a configuration option via a provided key.
+     *
+     * @return mixed Stored config
+     */
+    public function getAll()
+    {
+        return $this->config;
+    }
+
+
+    /**
      * Load configuration options from a file or directory.
      *
      * @param string $path     Path to configuration file or directory
