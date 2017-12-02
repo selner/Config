@@ -9,15 +9,17 @@ abstract class Loader implements Loadable
 {
     /** @var mixed Raw array of path to a configuration file or directory */
     protected $context;
+    protected $importKey;
 
     /**
      * Class constructor, loads on object creation.
      *
      * @param mixed $context Path to configuration file or directory
      */
-    public function __construct($context)
+    public function __construct($context, $importKey = "imports")
     {
         $this->context = $context;
+        $this->importKey = $importKey;
     }
 
     public function toArray($override=true)
@@ -44,10 +46,11 @@ abstract class Loader implements Loadable
             foreach(array_keys($config[$this->importKey]) as $childKey)
             {
                 $childConfig = new Config($config[$this->importKey][$childKey]);
+                $arrChild = $childConfig->getAll();
                 if ($override === true) {
-                    $config = $this->array_merge_recursive_distinct($config, $childConfig);
+                    $config = $this->array_merge_recursive_distinct($config, $arrChild);
                 } else {
-                    $config = $this->array_merge_recursive_distinct($childConfig, $config);
+                    $config = $this->array_merge_recursive_distinct($arrChild, $config);
                 }
             }
         }
