@@ -12,7 +12,7 @@ class Ini extends Loader
      *
      * @return array Array of configuration options
      */
-    public function getArray()
+    protected function getArray()
     {
         $parsed = @parse_ini_file($this->context, true, INI_SCANNER_TYPED);
 

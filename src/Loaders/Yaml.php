@@ -14,7 +14,7 @@ class Yaml extends Loader
      *
      * @return array Array of configuration options
      */
-    public function getArray()
+    protected function getArray()
     {
         try {
             $parsed = YamlParser::parse(file_get_contents($this->context));

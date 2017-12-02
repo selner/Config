@@ -12,7 +12,7 @@ class Json extends Loader
      *
      * @return array Array of configuration options
      */
-    public function getArray()
+    protected function getArray()
     {
         $contents = file_get_contents($this->context);
 

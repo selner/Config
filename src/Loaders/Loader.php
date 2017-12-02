@@ -18,4 +18,14 @@ abstract class Loader implements Loadable
     {
         $this->context = $context;
     }
+
+    public function toArray()
+    {
+        $arr = $this->getArray();
+        if(empty($arr))
+            return array();
+
+        return $arr;
+    }
+
 }

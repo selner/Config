@@ -12,7 +12,7 @@ class Php extends Loader
      *
      * @return array Array of configuration options
      */
-    public function getArray()
+    protected function getArray()
     {
         $contents = include $this->context;
 

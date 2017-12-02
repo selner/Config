@@ -14,7 +14,7 @@ class Directory extends Loader
      *
      * @return array Array of configuration options
      */
-    public function getArray()
+    protected function getArray()
     {
         $contents = [];
 
@@ -29,7 +29,7 @@ class Directory extends Loader
             $loader = new $classPath($file->getPathname());
 
             try {
-                $contents = array_merge($contents, $loader->getArray());
+                $contents = array_merge($contents, $loader->toArray());
             } catch (InvalidFileException $e) {
                 // Ignore it and continue
             }

@@ -12,7 +12,7 @@ class Xml extends Loader
      *
      * @return array Array of configuration options
      */
-    public function getArray()
+    protected function getArray()
     {
         $parsed = @simplexml_load_file($this->context);
 
