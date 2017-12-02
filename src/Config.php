@@ -53,10 +53,9 @@ class Config implements \ArrayAccess
     {
         if(array_key_exists($importKey, $context) && $context[$importKey] === true)
         {
-            $contexts = ($importKey);
-            foreach(array_keys($contexts[$importKey]) as $childKey)
+            foreach(array_keys($context[$importKey]) as $childKey)
             {
-                $childContexts[$childKey] = $contexts[$importKey][$childKey];
+                $childContexts[$childKey] = $context[$importKey][$childKey];
                 $this->processImports($importKey, $childContexts[$childKey], $childContexts);
             }
         }
