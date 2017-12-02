@@ -28,6 +28,7 @@ class Config implements \ArrayAccess
      */
     public function __construct($context = null, $importKey = "imports", $override = false)
     {
+
         switch (gettype($context)) {
             case 'NULL':
                 break;
@@ -36,16 +37,19 @@ class Config implements \ArrayAccess
                 break;
             case 'string':
                 $this->load($context);
+                if(is_file($context))
+                {
+                    $childContexts = array();
+                    $this->processImports($importKey, $this->config,$childContexts);
+                    if(!empty($childContexts))
+                        foreach($childContexts as $childContext)
+                            $this->load($childContext, $override);
+                }
+
                 break;
             default:
                 throw new InvalidContextException('Failed to initialize config');
         }
-
-        $childContexts = array();
-        $this->processImports($importKey, $this->config, $childContexts);
-        if(!empty($childContexts))
-            foreach($childContexts as $childContext)
-                $this->load($childContext, $override);
 
     }
 
@@ -85,7 +89,7 @@ class Config implements \ArrayAccess
      * @param string $key   Unique configuration option key
      * @param mixed  $value Config item value
      *
-     * @return object This Config object
+     * @return boolean Returns true if successful
      */
     public function set($key, $value)
     {
