@@ -227,7 +227,7 @@ class Config implements \ArrayAccess
      * @author Gabriel Sobrinho <gabriel (dot) sobrinho (at) gmail (dot) com>
      * @see http://php.net/manual/en/function.array-merge-recursive.php#92195
      */
-    function array_merge_recursive_distinct ( array &$array1, array &$array2 )
+	private function array_merge_recursive_distinct ( array &$array1, array &$array2 )
     {
         $merged = $array1;
 

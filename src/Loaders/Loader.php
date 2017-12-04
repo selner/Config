@@ -81,9 +81,10 @@ abstract class Loader implements Loadable
      * @param array $array1
      * @param array $array2
      * @return array
+	 *
      * @author Daniel <daniel (at) danielsmedegaardbuus (dot) dk>
      * @author Gabriel Sobrinho <gabriel (dot) sobrinho (at) gmail (dot) com>
-     * @see http://php.net/manual/en/function.array-merge-recursive.php#92195
+     * @Link http://php.net/manual/en/function.array-merge-recursive.php#92195
      */
     function array_merge_recursive_distinct ( array &$array1, array &$array2 )
     {
