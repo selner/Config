@@ -20,7 +20,7 @@ class IniTest extends PHPUnit_Framework_TestCase
         $config->load(__DIR__ . '/files/ini/config_imports.ini', false);
 
         // verify we got an expected value from the root INI file
-        $this->assertEquals('postmaster@localhost', $config->get('email.admin'));
+        $this->assertEquals('admin@emailserver.net', $config->get('alerts.email'));
 
         // verify we got an expected value from the child INI file
         $this->assertEquals('localhost', $config->get('drivers.mysql.host'));
@@ -37,7 +37,7 @@ class IniTest extends PHPUnit_Framework_TestCase
         $config->load(__DIR__ . '/files/ini/config_imports.ini', true);
 
         // verify we got an expected value from the root INI file
-        $this->assertEquals('postmaster@localhost', $config->get('email.admin'));
+	    $this->assertEquals('admin@emailserver.net', $config->get('alerts.email'));
 
         // verify we got an expected value from the child INI file
         $this->assertEquals('localhost', $config->get('drivers.mysql.host'));
@@ -46,13 +46,22 @@ class IniTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hunter2', $config->get('drivers.mysql.password'));
     }
 
-    public function test_it_can_load_typed_values()
-    {
-        $config = new Config\Config();
+	public function test_it_can_load_typed_values()
+	{
+		$config = new Config\Config();
 
-        $config->set('drivers.mysql.port', null);
-        $config->load(__DIR__ . '/files/ini/config.ini', true);
+		$config->set('drivers.mysql.port', null);
+		$config->load(__DIR__ . '/files/ini/config.ini', true);
 
-        $this->assertInternalType("int", $config->get('drivers.mysql.port'));
-    }
+		$this->assertInternalType("int", $config->get('drivers.mysql.port'));
+	}
+
+	public function test_it_can_load_dot_notation()
+	{
+		$config = new Config\Config();
+
+		$config->load(__DIR__ . '/files/ini/config.ini', true);
+
+		$this->assertArraySubset(['email' => ['server' => ['smtp' => [ 'host' => 'tls://smpt.emailserver.netcom:587', 'smtpdebug' => 0]]]], $config->getAll());
+	}
 }
