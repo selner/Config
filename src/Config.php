@@ -45,6 +45,12 @@ class Config implements \ArrayAccess
 
     }
 
+    private function _proccesLoadedData()
+    {
+		$this->convert_dot_notation($this->config);
+		ksort($this->config);
+    }
+
     /**
      * Magic get method; allows accessing config items via object notation.
      *
@@ -167,6 +173,8 @@ class Config implements \ArrayAccess
                 $this->config = $this->array_merge_recursive_distinct($thisArr, $this->config);
             }
 
+            $this->_proccesLoadedData();
+
             return $this;
         }
 
@@ -245,5 +253,82 @@ class Config implements \ArrayAccess
 
         return $merged;
     }
+
+
+	/**
+	 * Returns an array of all the keys of all values at every level
+	 * of a multi-dimensional array
+	 *
+	 * @param array $arr
+	 *
+	 * @return array the set of all keys used for values at all levels in the array
+	 */
+	private function array_keys_multi(array $arr)
+	{
+		$keys = array();
+
+		foreach ($arr as $key => $value) {
+			$keys[] = $key;
+
+			if (is_array($value)) {
+				$keys = array_merge($keys, $this->array_keys_multi($value));
+			}
+		}
+
+		return $keys;
+	}
+
+	/**
+	 * If you need, for some reason, to create variable Multi-Dimensional Arrays, here's a quick
+	 * function that will allow you to have any number of sub elements without knowing how many
+	 * elements there will be ahead of time. Note that this will overwrite an existing array
+	 * value of the same path.
+	 *
+	 * @author brian at blueeye dot us
+	 * @Link http://php.net/manual/en/function.array.php#52138
+	 *
+	 * @param $path
+	 * @param $data
+	 *
+	 * @return mixed
+	 */
+	private function array_set_element(&$path, $data) {
+		return ($key = array_pop($path)) ? $this->array_set_element($path, array($key=>$data)) : $data;
+	}
+
+	/**
+	 *
+	 * Some INI files use dot or colon notation to define section and subkeys.  Convert
+	 * any keys with dot notion to be subarray elements of the overall config array.
+	 *
+	 * Example:
+	 *      database.connector.mysql.host = dbserver01.myserver.net
+	 *  becomes
+	 *      config['database']['connector']['mysql']['myhost']
+	 *
+	 * @param $config array storing the loaded configuration data
+	 *
+	 */
+	private function convert_dot_notation(&$config)
+	{
+		$allKeys = $this->array_keys_multi($config);
+		$sectionedKeys = array_filter($allKeys, function ($v) {
+			$keyLevels = preg_split("/\s*[\.:]\s*/", $v);
+			if (count($keyLevels) > 1)
+				return true;
+
+			return false;
+		});
+
+		foreach ($sectionedKeys as $treeKey) {
+			$keyPath = preg_split("/\s*[\.:]\s*/", $treeKey);
+			$newValues = $this->array_set_element($keyPath, $config[$treeKey]);
+
+			$config = $this->array_merge_recursive_distinct($config, $newValues);
+			unset($config[$treeKey]);
+		}
+	}
+
+
 
 }
