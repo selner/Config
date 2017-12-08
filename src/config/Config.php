@@ -163,7 +163,7 @@ class Config implements \ArrayAccess
 
         $fileType = $file->isDir() ? 'Directory' : ucfirst(strtolower($file->getExtension()));
         $className = "\\PHLAK\\Config\\Loaders\\" . $fileType;
-        if(class_exists($className, true)) {
+        try {
             $loader = new $className($file->getRealPath(), $importKey);
 
             $thisArr = $loader->toArray($override);
@@ -177,6 +177,11 @@ class Config implements \ArrayAccess
 
             return $this;
         }
+        catch (\Exception $ex)
+        {
+        	throw $ex;
+        }
+
 
         throw new \InvalidArgumentException("No loader defined for files of type '{$fileType}'.");
 
