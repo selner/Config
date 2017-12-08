@@ -161,7 +161,7 @@ class Config implements \ArrayAccess
     {
         $file = new SplFileInfo($path);
 
-        $fileType = $file->isDir() ? 'Directory' : ucfirst(strtolower($file->getExtension()));
+        $fileType = $file->isDir() ? 'Directory' : strtolower($file->getExtension());
         $className = "\\PHLAK\\Config\\Loaders\\" . $fileType;
         if(class_exists($className, true)) {
             $loader = new $className($file->getRealPath(), $importKey);
