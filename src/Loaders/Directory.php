@@ -29,7 +29,9 @@ class Directory extends Loader
             $loader = new $classPath($file->getPathname());
 
             try {
-                $contents = array_merge($contents, $loader->toArray());
+            	$loadedContents = $loader->getArray();
+            	if(!empty($loadedContents) && is_array($loadedContents))
+	                $contents = array_merge($contents, $loadedContents);
             } catch (InvalidFileException $e) {
                 // Ignore it and continue
             }

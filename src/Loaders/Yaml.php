@@ -8,24 +8,31 @@ use Symfony\Component\Yaml\Exception\ParseException;
 
 class Yaml extends Loader
 {
-    /**
-     * Retrieve the contents of a .yaml file and convert it to an array of
-     * configuration options.
-     *
-     * @return array Array of configuration options
-     */
+	/**
+	 * Retrieve the contents of a YAML file and convert it to an array of
+	 * configuration options.
+	 *
+	 * @return array Array of configuration options
+	 * @throws \PHLAK\Config\Exceptions\InvalidFileException
+	 */
     protected function getArray()
     {
-        try {
-            $parsed = YamlParser::parse(file_get_contents($this->context));
-        } catch (ParseException $e) {
-            throw new InvalidFileException($e->getMessage());
-        }
+	    try
+	    {
+		    $parsed = YamlParser::parse(file_get_contents($this->context));
+		    if (empty($parsed)) {
+			    throw new InvalidFileException('Failed to parse INI file ' . $this->context . ": " . error_get_last());
+		    }
 
-        if (! is_array($parsed)) {
-            throw new InvalidFileException('Unable to parse invalid YAML file at ' . $this->context);
-        }
-
-        return $parsed;
+		    return $parsed;
+	    }
+	    catch (ParseException $e)
+	    {
+		    throw new InvalidFileException('Failed to parse YAML file "' . $this->context . '": ' . $e->getMessage(), $previous=$e);
+	    }
+	    catch (\Exception $ex)
+	    {
+		    throw new InvalidFileException('Failed to parse YAML file "' . $this->context . '": ' . $ex->getMessage(), $previous=$ex);
+	    }
     }
 }

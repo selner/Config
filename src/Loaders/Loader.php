@@ -3,6 +3,7 @@
 namespace PHLAK\Config\Loaders;
 
 use PHLAK\Config\Config;
+use PHLAK\Config\Exceptions\InvalidFileException;
 use PHLAK\Config\Interfaces\Loadable;
 
 abstract class Loader implements Loadable
@@ -22,13 +23,22 @@ abstract class Loader implements Loadable
         $this->importKey = $importKey;
     }
 
-    public function toArray($override=true)
+	/**
+	 * @param bool $override
+	 *
+	 * @return array
+	 * @throws \PHLAK\Config\Exceptions\InvalidFileException
+	 */
+	public function toArray($override=true)
     {
         $arr = $this->getArray();
         if(empty($arr))
             return array();
 
-        $this->processImports($arr, $override);
+        if(!is_array($arr))
+	        throw new InvalidFileException('Failed get configuration array from context ');
+
+	    $this->processImports($arr, $override);
         return $arr;
     }
 

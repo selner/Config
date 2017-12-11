@@ -3,6 +3,7 @@
 namespace PHLAK\Config;
 ini_set('auto_detect_line_endings', true);
 
+use PHLAK\Config\Exceptions\InvalidFileException;
 use PHLAK\Config\Traits\ArrayAccess;
 use PHLAK\Config\Exceptions\InvalidContextException;
 use \SplFileInfo;
