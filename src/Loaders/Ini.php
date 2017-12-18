@@ -23,7 +23,7 @@ class Ini extends Loader
 	    {
 		    $parsed = parse_ini_file($this->context, true, INI_SCANNER_TYPED);
 		    if (empty($parsed)) {
-			    throw new InvalidFileException('Failed to parse INI file ' . $this->context . ": " . error_get_last());
+			    throw new InvalidFileException('Failed to parse INI file ' . $this->context . ": " . error_get_last()['message']);
 		    }
 
 		    return $parsed;
